@@ -2,6 +2,15 @@
 This little project should detect all persons in an image/video and mark everybody red (unmasked) and blue (masked). It can help stores to check if thier clients wear masks during the corona-pandemic!
 
 
+## Arguments
+You have to give at least one argument to run this code. There are some available:
+- `-help` That is clear
+- `-test` Test images inside 'data/test' and returns the result per image
+- `-webcam` Get a videostream of a webcam and check for faces
+- `-train [epochs]` Train images. Epochs has to be given
+
+
+
 ## How can I train the model?
 You have to make three additionel directories inside 'data/train/':
 - no_mask     (Images without masks)
