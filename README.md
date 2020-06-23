@@ -2,7 +2,7 @@
 This little project should detect all persons in an image/video and mark everybody red (unmasked) and blue (masked). It can help stores to check if thier clients wear masks during the corona-pandemic!
 
 
-# How can I train the model?
+## How can I train the model?
 You have to make three additionel directories inside 'data/train/':
 - no_mask     (Images without masks)
 - tensors     (Leave it empty)
