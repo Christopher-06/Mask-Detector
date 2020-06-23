@@ -8,4 +8,5 @@ You have to make three additionel directories inside 'data/train/':
 - tensors     (Leave it empty)
 - with_mask   (Images with masks)
 
-If you have all your images prepared and inserted, simply run 'python3 main.py -newbatches -train 5'. This will start the program and make first some training batch files and then trains over 5 epochs. The early created batch files help you to not calculate every time new tensors (Efficiency aspects).
+If you have all your images prepared and inserted, simply run > python3 main.py -newbatches -train 5
+This will start the program and make first some training batch files and then trains over 5 epochs. The early created batch files help you to not calculate every time new tensors (Efficiency aspects).
