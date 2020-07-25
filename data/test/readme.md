@@ -1,2 +1,1 @@
-# How can I run a test round?
-look at the main readme.md
+## This folder contains images of persons with and without mask. Read more in the main readme! 
