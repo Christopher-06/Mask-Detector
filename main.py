@@ -1,8 +1,11 @@
 from network import *
 import config as conf
 import argparse
-import time
+import os, time
+import json
+import matplotlib.pyplot as plt
 
+# Arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-train', help='Start a training session. Specify the epochs', type=int)
 parser.add_argument('-test', help='Test all images and get result', action='store_true')
@@ -21,11 +24,51 @@ def main():
     if args.test:
         Tester(model).run()
     if args.webcam:
-        Webcam_Agent(model).run()
+        if os.path.isfile(conf.webcams_filename) is False:
+            # Error prehandling
+            print(f"'{conf.webcams_filename}' does not exist. Please create one and/or adjust the config file")
+            exit()
+
+        # Loading the file
+        print(f"Loading {conf.webcams_filename}")
+        try:
+            f = open(conf.webcams_filename)
+            obj = json.loads(f.read())
+            f.close()
+        except:
+            print("Failed to load file. Exit")
+            exit()
+
+        agents = []
+        for cam in obj:
+            # Start all agents
+            agent = Webcam_Agent(model, cam['url'], cam['name'], run_thread_start=True)
+            agents.append(agent)
+
+
+        while True:
+            if conf.show_webcam_images:                
+                for agent in agents:
+                    # Prepare images
+                    if agent.cam_alive and agent.proceed_img is not None:
+                        cv2.imshow(agent.name, agent.proceed_img)
+                    else:
+                        cv2.imshow(agent.name, conf.no_video_stream)
+
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    # Video play abort
+                    cv2.destroyAllWindows()
+                    break
+            else:
+                time.sleep(1)
 
 
     print(f"Program took {time.time() - start_time}s")
     print("Goodbye")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Keyboard interrupt. Exit")
+        exit()
