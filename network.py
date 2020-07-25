@@ -189,13 +189,16 @@ class Trainer():
         self.batch_index = 0
 
     def get_batch(self):
-        if len(listdir('data/train/tensors/')) == 0:
+        if len(listdir('data/train/tensors/')) == 0 or '.md' in listdir('data/train/tensors/')[0]:
             # be sure to have some batch files
             print('No tensor files avaible. Please make some...')
             return None        
 
         # choose one random file
         file_name = np.random.choice(listdir('data/train/tensors/'))
+        while '.tensor' in file_name == False:
+            # be sure to have a tensor file
+            file_name = np.random.choice(listdir('data/train/tensors/'))
         tensor_file = T.load('data/train/tensors/' + file_name)
 
         tensors, targets = [], []
@@ -290,12 +293,23 @@ class Tester:
         print(f'Images Tested: {wrong + correct}   Correct: {correct}   Wrong: {wrong}   Percentage: {int(correct / float(correct + wrong) * 100.)}%')
 
 class Webcam_Agent():
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, model, cam_url, name = '(Unknown)', run_thread_start = False):
+        self.model = model        
+        self.cam_url = cam_url
+        self.name = name
         self.last_img = None
+        self.proceed_img = None
+        self.cam_alive = False
+        # Stream Thread
         self.streaming_thread = Thread(target=self.get_stream)
         self.streaming_thread.daemon = True
         self.streaming_thread.start()
+
+        if run_thread_start:
+            # Run Thread
+            self.run_thread = Thread(target=self.run)
+            self.run_thread.daemon = True
+            self.run_thread.start()
 
     def get_stream(self):     
         # get current image from webcam   
@@ -305,12 +319,14 @@ class Webcam_Agent():
                     # if no connection is available or an error occured,
                     # the image will become None:
                     # Then reinit the capture
-                    cap = cv2.VideoCapture(conf.cam_url)
+                    cap = cv2.VideoCapture(self.cam_url)
+                    self.cam_alive = False
 
-                _, self.last_img = cap.read()                
+                _, self.last_img = cap.read()                                
             except:
                 # restart connection
-                cap = cv2.VideoCapture(conf.cam_url)
+                cap = cv2.VideoCapture(self.cam_url)
+                self.cam_alive = False
 
     def run(self):     
         self.model.eval()   
@@ -324,6 +340,7 @@ class Webcam_Agent():
             # get a copy of the image(-array)
             # detect all faces
             img = self.last_img.copy()
+            self.cam_alive = True
             (faces, boxes) = detect_faces(img)   
 
 
@@ -348,8 +365,11 @@ class Webcam_Agent():
                         img = cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), thickness=3)
                         cv2.putText(img, 'No mask', (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
+                        
+            self.proceed_img = cv2.resize(img, (512, 512))
+
             # show image
-            cv2.imshow('frame', img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                break
+            #cv2.imshow(self.name, img)
+            #if cv2.waitKey(1) & 0xFF == ord('q'):
+            #    cv2.destroyAllWindows()
+            #    break
