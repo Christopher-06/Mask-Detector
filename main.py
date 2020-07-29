@@ -4,6 +4,7 @@ import argparse
 import os, time
 import json
 import matplotlib.pyplot as plt
+import cv2
 
 # Arguments
 parser = argparse.ArgumentParser()
@@ -11,6 +12,7 @@ parser.add_argument('-train', help='Start a training session. Specify the epochs
 parser.add_argument('-test', help='Test all images and get result', action='store_true')
 parser.add_argument('-webcam', help='Streaming a webcam', action='store_true')
 parser.add_argument('-newbatches', help='make new batch files (Training porpuse)', action='store_true')
+parser.add_argument('-video', help='test an entire video', action='store_true')
 args = parser.parse_args()
 
 def main():
@@ -23,6 +25,17 @@ def main():
         model = Trainer(model, args.train).run()
     if args.test:
         Tester(model).run()
+    if args.video:
+        videos = os.listdir('data/test/video/')
+        if len(videos) == 0:
+            # Error if no videos are available
+            print('No videos found in data/test/video/. Please add any')
+
+        for vid in videos:
+            if '.mp4' in vid or '.avi' in vid:
+                VideoAgent(model, vid).do_job()
+        
+
     if args.webcam:
         if os.path.isfile(conf.webcams_filename) is False:
             # Error prehandling

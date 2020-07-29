@@ -11,6 +11,7 @@ import time
 import os
 from os import path, listdir
 import config as conf
+from tqdm import tqdm
 
 if T.cuda.is_available():
     T.cuda.empty_cache()
@@ -368,8 +369,60 @@ class Webcam_Agent():
                         
             self.proceed_img = cv2.resize(img, (512, 512))
 
-            # show image
-            #cv2.imshow(self.name, img)
-            #if cv2.waitKey(1) & 0xFF == ord('q'):
-            #    cv2.destroyAllWindows()
-            #    break
+class VideoAgent():
+    def __init__(self, model : MaskDetector, filename):
+        self.filename = filename
+        self.cap = cv2.VideoCapture('data/test/video/' + filename)
+        self.model = model
+        self.out = None
+
+    def do_job(self):
+        length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        print(length)
+        p_bar = tqdm(total=length, desc=self.filename)
+        while(self.cap.isOpened()):
+            ret, frame = self.cap.read()
+            
+            if ret == False:
+                p_bar.close()
+                print('Video ending. Saving for ' + self.filename)
+                break
+
+            if self.out is None:
+                # Create video writer
+                height, width, _ = frame.shape
+                self.out = cv2.VideoWriter('data/test/video/out_' + self.filename + '.avi', 
+                            cv2.VideoWriter_fourcc(*'XVID'),
+                            20.0, (width, height))   
+
+            (faces, boxes) = detect_faces(frame)   
+            for index, box in enumerate(boxes):
+                # perform on every face
+                face = faces[index]
+
+                if face is not None:
+                    # get start and end coordinates. As well the point where the text should stand
+                    startX, startY, endX, endY = box[0], box[1], box[2], box[3]
+                    y = startY - 10 if startY - 10 > 10 else startY + 10
+
+                    # test if a mask is anywhere
+                    _input = conf.transform(face).to(conf.device).unsqueeze(0)
+                    _output = self.model(_input)    
+                    if has_mask(_output):
+                        # masked person --> Blue border
+                        frame = cv2.rectangle(frame, (startX, startY), (endX, endY), (255, 0, 0), thickness=3)
+                        cv2.putText(frame, 'Masked', (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 0), 2)
+                    else:
+                        # unmasked person --> Red border
+                        frame = cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 0, 255), thickness=3)
+                        cv2.putText(frame, 'No mask', (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+
+            self.out.write(frame)
+            p_bar.update(1)
+           # cv2.imshow('video', cv2.resize(frame,(int(width/3), int(height/3))))
+            #cv2.waitKey()
+            #cv2.destroyAllWindows()
+
+        self.cap.release()
+        if self.out is not None:
+            self.out.release()
