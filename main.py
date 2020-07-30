@@ -1,4 +1,5 @@
 from network import *
+from helper import *
 import config as conf
 import argparse
 import os, time
@@ -16,8 +17,11 @@ parser.add_argument('-video', help='test an entire video', action='store_true')
 args = parser.parse_args()
 
 def main():
-    start_time = time.time()
     model = load()    
+
+    model = VideoAgent(model, 'No_Masked.mp4').do_train(False)  
+    model = VideoAgent(model, 'With_Mask.mp4').do_train(True)  
+
 
     if args.newbatches:
         make_training_batch_files()
@@ -33,8 +37,8 @@ def main():
 
         for vid in videos:
             if '.mp4' in vid or '.avi' in vid:
-                VideoAgent(model, vid).do_job()
-        
+                if not 'out_' in vid:
+                    VideoAgent(model, vid).do_test()       
 
     if args.webcam:
         if os.path.isfile(conf.webcams_filename) is False:
@@ -55,7 +59,7 @@ def main():
         agents = []
         for cam in obj:
             # Start all agents
-            agent = Webcam_Agent(model, cam['url'], cam['name'], run_thread_start=True)
+            agent = WebcamAgent(model, cam['url'], cam['name'], run_thread_start=True)
             agents.append(agent)
 
 
@@ -76,12 +80,14 @@ def main():
                 time.sleep(1)
 
 
-    print(f"Program took {time.time() - start_time}s")
-    print("Goodbye")
-
 if __name__ == "__main__":
+    start_time = time.time()
+
     try:
         main()
     except KeyboardInterrupt:
         print("Keyboard interrupt. Exit")
         exit()
+    
+    print(f"Program took {time.time() - start_time}s")
+    print("Goodbye")
