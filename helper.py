@@ -15,6 +15,8 @@ import os
 from os import path, listdir
 from tqdm import tqdm
 
+# *** Batch Functions ***
+
 def get_file_lists():
     # list all training photos
     return  [(i, [1, 0]) for i in listdir('data/train/no_mask')] + [(i, [0, 1]) for i in listdir('data/train/with_mask')] 
@@ -23,42 +25,6 @@ def get_batch_count():
     # calculate total avaible batches
     files = len(listdir('data/train/no_mask')) + len(listdir('data/train/with_mask'))
     return int(files / conf.batch_size)
-
-def detect_faces(img):  
-    if img is None:
-        # Error prehandling
-        return ([], [])    
-        
-    # load Caffe model and prepare image
-    net = cv2.dnn.readNetFromCaffe('data/deploy.prototxt.txt', 'data/face_detection.caffemodel')
-    (h, w) = img.shape[:2]
-    blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)), 1.0,
-            (300, 300), (104.0, 177.0, 123.0))
-
-    net.setInput(blob)
-    detections = net.forward()
-    faces, boxes = [], []
-    for i in range(0, detections.shape[2]):
-        # iterate through every face
-        confidence = detections[0, 0, i, 2]
-        if confidence > 0.5:
-            # face is ok
-            # --> get box coordinates
-            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-            (startX, startY, endX, endY) = box.astype("int")                                           
-            face = img[startY:endY, startX:endX]
-
-            if face is not None:
-                try:
-                    # try to resize
-                    face = cv2.resize(face, (80, 100))
-                    faces.append(face)
-                    boxes.append((startX, startY, endX, endY))
-                except:
-                    # img slice gives some shit back
-                    pass
-                
-    return (faces, boxes)
 
 def make_training_batch_files():        
     # delete old
@@ -110,6 +76,43 @@ def make_training_batch_files():
     print("finished")
     print(f'Masked: {masked_faces}   Unmasked: {normal_faces}')
 
+
+
+def detect_faces(img):  
+    if img is None:
+        # Error prehandling
+        return ([], [])    
+        
+    # load Caffe model and prepare image
+    net = cv2.dnn.readNetFromCaffe('data/deploy.prototxt.txt', 'data/face_detection.caffemodel')
+    (h, w) = img.shape[:2]
+    blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)), 1.0,
+            (300, 300), (104.0, 177.0, 123.0))
+
+    net.setInput(blob)
+    detections = net.forward()
+    faces, boxes = [], []
+    for i in range(0, detections.shape[2]):
+        # iterate through every face
+        confidence = detections[0, 0, i, 2]
+        if confidence > 0.5:
+            # face is ok
+            # --> get box coordinates
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")                                           
+            face = img[startY:endY, startX:endX]
+
+            if face is not None:
+                try:
+                    # try to resize
+                    face = cv2.resize(face, (80, 100))
+                    faces.append(face)
+                    boxes.append((startX, startY, endX, endY))
+                except:
+                    # img slice gives some shit back
+                    pass
+                
+    return (faces, boxes)
 
 # *** AGENTS ***
 
@@ -191,15 +194,18 @@ class WebcamAgent():
 
 
 class VideoAgent():
-    def __init__(self, model : MaskDetector, filename):
+    def __init__(self, model : MaskDetector, filename, in_test_folder=True):
         self.filename = filename
-        self.cap = cv2.VideoCapture('data/test/video/' + filename)
+        if in_test_folder:
+            self.cap = cv2.VideoCapture('data/test/video/' + filename)
+        else:
+            self.cap = cv2.VideoCapture(filename)
         self.model = model
         self.out = None
 
     def do_test(self):
         length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        p_bar = tqdm(total=length, desc='Test ' + self.filename)
+        p_bar = tqdm(total=length, desc='Test ' + str(self.filename).split('/')[-1])
         self.model.eval()
 
         while(self.cap.isOpened()):
@@ -213,7 +219,7 @@ class VideoAgent():
             if self.out is None:
                 # Create video writer
                 height, width, _ = frame.shape
-                self.out = cv2.VideoWriter('data/test/video/out_' + self.filename + '.avi', 
+                self.out = cv2.VideoWriter('data/test/video/out_' + str(self.filename).split('/')[-1] + '.avi', 
                             cv2.VideoWriter_fourcc(*'XVID'),
                             20.0, (width, height))   
 
@@ -250,7 +256,7 @@ class VideoAgent():
         # Prepare progress bar
         length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         if show_p_bar:
-            p_bar = tqdm(total=length, desc='Train ' + self.filename)
+            p_bar = tqdm(total=length, desc='Train ' + str(self.filename).split('/')[-1])
 
         # Define target
         _target = T.tensor([0, 1] if has_mask else [1, 0], dtype=T.float32).to(conf.device)

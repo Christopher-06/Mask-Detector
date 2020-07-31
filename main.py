@@ -13,15 +13,11 @@ parser.add_argument('-train', help='Start a training session. Specify the epochs
 parser.add_argument('-test', help='Test all images and get result', action='store_true')
 parser.add_argument('-webcam', help='Streaming a webcam', action='store_true')
 parser.add_argument('-newbatches', help='make new batch files (Training porpuse)', action='store_true')
-parser.add_argument('-video', help='test an entire video', action='store_true')
+parser.add_argument('-video', help='train and/or test an entire video', action='store_true')
 args = parser.parse_args()
 
 def main():
     model = load()    
-
-    model = VideoAgent(model, 'No_Masked.mp4').do_train(False)  
-    model = VideoAgent(model, 'With_Mask.mp4').do_train(True)  
-
 
     if args.newbatches:
         make_training_batch_files()
@@ -30,6 +26,24 @@ def main():
     if args.test:
         Tester(model).run()
     if args.video:
+        prompt = input('Do you want to train some videos? [y/n] ')
+        if prompt in conf.YES:
+            # Training
+            files = get_file_lists()
+            for file, target in files:
+                if '.mp4' in file or '.avi' in file:
+                    if target == [0, 1]:
+                        model = VideoAgent(model, 
+                                'data/train/with_mask/' + file,
+                                 in_test_folder=False).do_train(True)  
+                    else:
+                        model = VideoAgent(model, 
+                                'data/train/no_mask/' + file,
+                                 in_test_folder=False).do_train(False)
+
+            print('Training ends. Starting testing...')
+            print('--------------------------------------')
+
         videos = os.listdir('data/test/video/')
         if len(videos) == 0:
             # Error if no videos are available
@@ -78,7 +92,6 @@ def main():
                     break
             else:
                 time.sleep(1)
-
 
 if __name__ == "__main__":
     start_time = time.time()
