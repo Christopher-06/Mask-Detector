@@ -1,3 +1,3 @@
 [
-    { "name" : "camera_main", "url" : "your_webcam_videostream_link" }
+    { "name" : "camera_name", "url" : "your_webcam_videostream_link" }
 ]
