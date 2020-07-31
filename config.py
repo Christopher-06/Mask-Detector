@@ -23,3 +23,7 @@ neural_network_file = 'data/detector_network_v2.pt'
 webcams_filename = 'webcams.json'
 
 device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
+
+#Prompt
+YES = {'y', 'yes', 'Yes', 'YES', 'yES'}
+NO = {'n', 'no', 'No', 'NO', 'nO'}
