@@ -123,7 +123,7 @@ class Trainer():
         for e in range(self.epochs):
             try:              
                 total_batch_count = helper.get_batch_count()
-                for i in range(helper.total_batch_count):
+                for i in range(total_batch_count):
                     start = time.time()
                     data = self.get_batch()
 
