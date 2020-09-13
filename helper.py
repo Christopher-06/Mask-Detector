@@ -1,4 +1,4 @@
-from network import *
+import network
 import config as conf
 
 import torch as T
@@ -180,7 +180,7 @@ class WebcamAgent():
                     # test if a mask is anywhere
                     _input = conf.transform(face).to(conf.device).unsqueeze(0)
                     _output = self.model(_input)    
-                    if has_mask(_output):
+                    if network.has_mask(_output):
                         # masked person --> Blue border
                         img = cv2.rectangle(img, (startX, startY), (endX, endY), (255, 0, 0), thickness=3)
                         cv2.putText(img, 'Masked', (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 0), 2)
@@ -194,7 +194,7 @@ class WebcamAgent():
 
 
 class VideoAgent():
-    def __init__(self, model : MaskDetector, filename, in_test_folder=True):
+    def __init__(self, model, filename, in_test_folder=True):
         self.filename = filename
         if in_test_folder:
             self.cap = cv2.VideoCapture('data/test/video/' + filename)
@@ -236,7 +236,7 @@ class VideoAgent():
                     # test if a mask is anywhere
                     _input = conf.transform(face).to(conf.device).unsqueeze(0)
                     _output = self.model(_input)    
-                    if has_mask(_output):
+                    if network.has_mask(_output):
                         # masked person --> Blue border
                         frame = cv2.rectangle(frame, (startX, startY), (endX, endY), (255, 0, 0), thickness=3)
                         cv2.putText(frame, 'Masked', (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 0), 2)
@@ -297,7 +297,7 @@ class VideoAgent():
                 p_bar.update(1)
 
         if save_model:
-            save(self.model)
+            network.save(self.model)
 
         self.cap.release()
         return self.model
