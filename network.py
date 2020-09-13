@@ -12,6 +12,7 @@ import os
 from os import path, listdir
 import config as conf
 from tqdm import tqdm
+import helper
 
 if T.cuda.is_available():
     T.cuda.empty_cache()
@@ -168,7 +169,7 @@ class Tester:
         for l in labels:
             files = listdir('data/test/' + l)
             for f in files:
-                for face in detect_faces(cv2.imread('data/test/' + l + '/' + f))[0]:    
+                for face in helper.detect_faces(cv2.imread('data/test/' + l + '/' + f))[0]:    
                     # get predicted values, 
                     # if the face wears a mask                
                     _output = self.model(conf.transform(face).to(conf.device).unsqueeze(0))
