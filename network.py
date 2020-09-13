@@ -89,7 +89,7 @@ class Trainer():
         self.optimizer = optim.Adam(self.model.parameters(), lr=conf.learning_rate)
         self.criterion = nn.BCELoss() 
 
-        self.files = get_file_lists()
+        self.files = helper.get_file_lists()
         self.batches = []
         self.batch_index = 0
 
@@ -122,8 +122,8 @@ class Trainer():
         self.model.train()  
         for e in range(self.epochs):
             try:              
-                total_batch_count = get_batch_count()
-                for i in range(total_batch_count):
+                total_batch_count = helper.get_batch_count()
+                for i in range(helper.total_batch_count):
                     start = time.time()
                     data = self.get_batch()
 
