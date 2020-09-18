@@ -1,8 +1,9 @@
 # Mask-Detector
 This little project should detect all persons in an image/video and mark everybody red (unmasked) and blue (masked). It can help stores to check if their clients wear masks during the corona-pandemic!
 
-[alt-text-2](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/with_mask/example.jpg)
-
+| [![VideoBlocks](https://d1ow200m9i3wyh.cloudfront.net/img/assets/videoblocks/images/logo.png)](http://videoblocks.com)  | [![AudioBlocks](https://dtyn3c8zjrx01.cloudfront.net/img/assets/audioblocks/images/logo.png)](http://audioblocks.com) | [![GraphicStock](http://www.graphicstock.com/images/logo.jpg)](http://graphicstock.com) |
+|:---:|:---:|:---:|
+| http://videoblocks.com | http://audioblocks.com | http://graphicstock.com |
 ## Arguments
 You have to give at least one argument to run this code. There are some available:
 - `-help` That is clear
