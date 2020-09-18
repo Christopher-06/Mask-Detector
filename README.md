@@ -1,7 +1,7 @@
 # Mask-Detector
 This little project should detect all persons in an image/video and mark everybody red (unmasked) and blue (masked). It can help stores to check if their clients wear masks during the corona-pandemic!
 
-| [![Unmasked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/no_mask/example.jpg)](ggg)  | [![Masked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/with_mask/example.jpg)](http://audioblocks.com) | [![GraphicStock](http://www.graphicstock.com/images/logo.jpg)](http://graphicstock.com) |
+| [![Unmasked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/no_mask/example.jpg)]  | [![Masked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/with_mask/example.jpg)](http://audioblocks.com) | [![GraphicStock](http://www.graphicstock.com/images/logo.jpg)](http://graphicstock.com) |
 |:---:|:---:|:---:|
 | http://videoblocks.com | http://audioblocks.com | http://graphicstock.com |
 ## Arguments
