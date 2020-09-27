@@ -22,7 +22,7 @@ First you have to define a webcam in the webcam.json file. If you don't own a we
 
 After downloading, you can start it and press the button 'Start server' at the bottom. On your screen should something be visible like `http://192.168.178.38:8080`. Enter this link in a browser and you see the livestream of your mobile camera. Then open the webcam.json file. Paste the link and add `/video`. The reason is that we only want the videostream. At the end you can name it as you want.
 
-`[ { "name" : "mobile_camera", "url" : "paste_here_your_link + /video" } ... ]`
+`[ { "name" : "mobile_camera", "url" : "paste_here_your_link + /video" } ]`
 
 You can add more webcams easily: Copy and paste this `,{ "name" : "mobile_camera", "url" : "paste_here_your_link + /video" }`. NOTE: You have to give each cam another name. Otherwise there will be only on window.
 
