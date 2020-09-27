@@ -1,6 +1,9 @@
 # Mask-Detector
 This little project should detect all persons in an image/video and mark everybody red (unmasked) and blue (masked). It can help stores to check if their clients wear masks during the corona-pandemic!
 
+<img src="https://img.shields.io/badge/Requirements-Python3%2C%20PyTorch%2C%20Pillow%2C%20Numpy%2C%20tqdm%2C%20Matplot%2C%20CV2-red?style=for-the-badge" />
+
+
 | ![Unmasked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/no_mask/example.jpg)  | ![Masked Person](https://raw.githubusercontent.com/Christopher-06/Mask-Detector/master/data/test/with_mask/example.jpg) |
 |:---:|:---:|
 | Unmasked Person | Masked Person |
